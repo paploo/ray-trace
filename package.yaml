@@ -1,10 +1,10 @@
 name:                ray-trace
 version:             0.1.0.0
-github:              "githubuser/ray-trace"
+github:              "paploo/ray-trace"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2019 Author name here"
+author:              "Jeff Reinecke"
+maintainer:          "jeff@paploo.net"
+copyright:           "2019 Jeff Reinecke"
 
 extra-source-files:
 - README.md
