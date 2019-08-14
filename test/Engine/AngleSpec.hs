@@ -1,7 +1,7 @@
-module AngleSpec (spec) where
+module Engine.AngleSpec (spec) where
 
 import Test.Hspec
-import Angle
+import Engine.Angle
 
 spec :: Spec
 spec = do
@@ -12,3 +12,6 @@ spec = do
 
         it "creates from degrees" $
             (radians (fromDegrees 180)) `shouldBe` pi
+
+        it "access degrees" $
+            (degrees (Angle pi)) `shouldBe` 180.0

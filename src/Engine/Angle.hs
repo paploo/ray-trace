@@ -1,4 +1,4 @@
-module Angle (
+module Engine.Angle (
     Angle(Angle),
     radians,
     fromDegrees,

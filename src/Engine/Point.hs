@@ -1,4 +1,4 @@
-module Point (
+module Engine.Point (
     Point(Point)
 ) where
 
