@@ -1,26 +1,26 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Engine.Geom (
-    Angle(Angle),
-    radians,
-    zeroAng,
-    fromDegrees,
-    degrees,
-    reversed,
-    unitCirclePt,
+  Angle(Angle)
+, radians
+, zeroAng
+, fromDegrees
+, degrees
+, reversed
+, unitCirclePt
 
-    Point(Point),
-    toTuple,
-    ptX,
-    ptY,
-    zeroPt,
-    ptFromDouble,
-    scalePt,
-    unitCircleAng,
+, Point(Point)
+, toTuple
+, ptX
+, ptY
+, zeroPt
+, ptFromDouble
+, scalePt
+, unitCircleAng
 
-    Line(Line),
-    parameterized,
-    intersectionParameters
+, Line(Line)
+, parameterized
+, intersectionParameters
 ) where
 
 ---

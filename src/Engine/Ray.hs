@@ -1,25 +1,42 @@
 module Engine.Ray (
-  Ray(Ray),
-  origin,
-  direction,
-  intensity,
-  wavelength
+  Ray(Ray)
+, rayOrigin
+, rayDirection
+, rayIntensity
+, rayWavelength
+, geometricRay
+
+, Wavelength(Wavelength)
+, waveMicrons
+, greenYellowWave
 ) where
 
 import Engine.Geom
-import Engine.Wavelength
+
+--
+-- Wavelength
+--
+
+newtype Wavelength = Wavelength { waveMicrons :: Double } deriving (Show, Eq, Ord)
+
+greenYellowWave :: Wavelength
+greenYellowWave = Wavelength 0.550
+
+--
+-- Ray
+--
 
 data Ray = Ray {
-    origin :: Point,
-    direction :: Angle,
-    intensity :: Double,
-    wavelength :: Wavelength
+    rayOrigin :: Point,
+    rayDirection :: Angle,
+    rayIntensity :: Double,
+    rayWavelength :: Wavelength
 } deriving (Show, Eq)
 
-simpleRay :: Point -> Angle -> Ray
-simpleRay o a = Ray {
-    origin = o,
-    direction = a,
-    intensity = 1.0,
-    wavelength = greenYellow
+geometricRay :: Point -> Angle -> Ray
+geometricRay o a = Ray {
+    rayOrigin = o,
+    rayDirection = a,
+    rayIntensity = 1.0,
+    rayWavelength = greenYellowWave
 }
