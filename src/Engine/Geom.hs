@@ -3,16 +3,24 @@
 module Engine.Geom (
     Angle(Angle),
     radians,
+    zeroAng,
     fromDegrees,
     degrees,
-    reverseAngle,
+    reversed,
+    unitCirclePt,
 
     Point(Point),
     toTuple,
     ptX,
     ptY,
-    pointMap,
-    pointMap2
+    zeroPt,
+    ptFromDouble,
+    scalePt,
+    unitCircleAng,
+
+    Line(Line),
+    parameterized,
+    intersectionParameters
 ) where
 
 ---
@@ -21,23 +29,26 @@ module Engine.Geom (
 
 newtype Angle = Angle { radians :: Double } deriving (Show, Eq, Ord, Num, Fractional)
 
+zeroAng :: Angle
+zeroAng = 0.0
+
 fromDegrees :: Double -> Angle
 fromDegrees a = Angle (a * pi / 180.0)
 
 degrees :: Angle -> Double
 degrees (Angle a) = a * 180.0 / pi
 
-reverseAngle :: Angle -> Angle
-reverseAngle (Angle a) = Angle (a - 180.0)
+reversed :: Angle -> Angle
+reversed (Angle a) = Angle (a - 180.0)
 
-unitCircle :: Angle -> Point
-unitCircle (Angle a) = Point ((cos a), (sin a))
+unitCirclePt :: Angle -> Point
+unitCirclePt (Angle a) = Point ((cos a), (sin a))
 
 instance Semigroup Angle where
     (<>) = (+)
 
 instance Monoid Angle where
-    mempty = 0.0
+    mempty = zeroAng
 
 --
 -- Point
@@ -51,35 +62,64 @@ ptX (Point (x,_)) = x
 ptY :: Point -> Double
 ptY (Point (_,y)) = y
 
-distance :: Point -> Point -> Double
-distance p1 p2 = sqrt (x*x + y*y)
-    where Point (x, y) = (p2 - p1)
+zeroPt :: Point
+zeroPt = Point (0.0, 0.0)
 
-pointMap :: (Double -> Double) -> Point -> Point
-pointMap f (Point (x,y)) = Point (f x, f y)
+ptFromDouble :: Double -> Point
+ptFromDouble a = Point (a, a)
 
-pointMap2 :: (Double -> Double -> Double) -> Point -> Point -> Point
-pointMap2 f (Point (x1, y1)) (Point (x2, y2)) = Point (f x1 x2, f y1 y2)
+scalePt :: Point -> Double -> Point
+scalePt p = (* p) . ptFromDouble
+
+unitCircleAng :: Point -> Angle
+unitCircleAng (Point (x,y)) = Angle (atan2 y x)
+
+ptMap :: (Double -> Double) -> Point -> Point
+ptMap f (Point (x,y)) = Point (f x, f y)
+
+ptMap2 :: (Double -> Double -> Double) -> Point -> Point -> Point
+ptMap2 f (Point (x1, y1)) (Point (x2, y2)) = Point (f x1 x2, f y1 y2)
 
 instance Show Point where
     show (Point (x,y)) = "Point (" ++ (show x) ++ ", " ++ (show y) ++ ")"
 
 instance Num Point where
-    (+) = pointMap2 (+)
-    (-) = pointMap2 (-)
-    (*) = pointMap2 (*)
-    negate = pointMap negate
-    abs = pointMap abs
-    signum = pointMap signum
+    (+) = ptMap2 (+)
+    (-) = ptMap2 (-)
+    (*) = ptMap2 (*)
+    negate = ptMap negate
+    abs = ptMap abs
+    signum = ptMap signum
     fromInteger k = Point (kd, kd) where kd = fromInteger k
 
 instance Fractional Point where
-    (/) = pointMap2 (/)
+    (/) = ptMap2 (/)
     fromRational r = Point (rd, rd) where rd = fromRational r
 
 instance Semigroup Point where
     (<>) = (+)
 
 instance Monoid Point where
-    mempty = Point (0.0, 0.0)
+    mempty = zeroPt
 
+---
+--- Line
+---
+
+data Line = Line {
+    linePt :: Point,
+    lineAng :: Angle
+} deriving (Show, Eq)
+
+parameterized :: Line -> Double -> Point
+parameterized (Line p a) t = (unitCirclePt a) * (ptFromDouble t) + p
+
+intersectionParameters :: Line -> Line -> (Double, Double)
+intersectionParameters (Line (Point (x1,y1)) (Angle a1)) (Line (Point (x2,y2)) (Angle a2)) = (u,v)
+    where
+        dx = x2 - x1
+        dy = y2 - y1
+        da = a2 - a1
+        csc = 1.0 / (sin da)
+        u = csc * (dx * sin a2 - dy * cos a2)
+        v = csc * (dx * sin a1 - dy * cos a1)
