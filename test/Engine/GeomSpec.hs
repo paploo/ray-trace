@@ -46,9 +46,19 @@ spec = do
 
         describe "parameterization and intersection" $ do
 
-            it "should be parameterized" $ do
-                result `ptShouldBeAbout` expected
-                    where
-                        line = Line (Point (3,4)) (Angle (pi/6))
-                        result = ((parameterized line) 2.0)
-                        expected = Point ((3 + sqrt 3), (4+1))
+            it "should solve for the intersection of two rays" $ let
+                line1 = Line (Point (-1, 10)) (Angle (pi/3))
+                line2 = Line (Point (1, 10)) (Angle (pi - pi/3))
+                (u, v) = intersectionParameters line1 line2
+                point1 = parameterized line1 $ u
+                point2 = parameterized line2 $ v
+                in do
+                    point1 `ptShouldBeAbout` point2
+
+
+            it "should be parameterized" $ let
+                line = Line (Point (3,4)) (Angle (pi/6))
+                result = ((parameterized line) 2.0)
+                expected = Point ((3 + sqrt 3), (4+1))
+                in do
+                  result `ptShouldBeAbout` expected
