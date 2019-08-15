@@ -1,4 +1,12 @@
-module Engine.Point (
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
+module Engine.Geom (
+    Angle(Angle),
+    radians,
+    fromDegrees,
+    degrees,
+    reverseAngle,
+
     Point(Point),
     toTuple,
     ptX,
@@ -6,6 +14,34 @@ module Engine.Point (
     pointMap,
     pointMap2
 ) where
+
+---
+--- Angle
+---
+
+newtype Angle = Angle { radians :: Double } deriving (Show, Eq, Ord, Num, Fractional)
+
+fromDegrees :: Double -> Angle
+fromDegrees a = Angle (a * pi / 180.0)
+
+degrees :: Angle -> Double
+degrees (Angle a) = a * 180.0 / pi
+
+reverseAngle :: Angle -> Angle
+reverseAngle (Angle a) = Angle (a - 180.0)
+
+unitCircle :: Angle -> Point
+unitCircle (Angle a) = Point ((cos a), (sin a))
+
+instance Semigroup Angle where
+    (<>) = (+)
+
+instance Monoid Angle where
+    mempty = 0.0
+
+--
+-- Point
+--
 
 newtype Point = Point { toTuple :: (Double, Double) } deriving (Eq)
 
@@ -46,3 +82,4 @@ instance Semigroup Point where
 
 instance Monoid Point where
     mempty = Point (0.0, 0.0)
+

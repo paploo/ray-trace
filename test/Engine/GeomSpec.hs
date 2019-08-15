@@ -1,7 +1,7 @@
-module Engine.AngleSpec (spec) where
+module Engine.GeomSpec (spec) where
 
 import Test.Hspec
-import Engine.Angle
+import Engine.Geom
 
 spec :: Spec
 spec = do

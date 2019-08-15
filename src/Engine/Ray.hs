@@ -6,8 +6,7 @@ module Engine.Ray (
   wavelength
 ) where
 
-import Engine.Angle
-import Engine.Point
+import Engine.Geom
 import Engine.Wavelength
 
 data Ray = Ray {
