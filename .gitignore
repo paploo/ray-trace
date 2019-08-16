@@ -1,6 +1,14 @@
+# Stack defaults
 .stack-work/
 ray-trace.cabal
 *~
 
+# IntelliJ
+.idea
+*.iml
+
+# Vim
 *.sw[a-z]
+
+# OS X
 .DS_Store
