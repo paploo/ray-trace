@@ -21,6 +21,7 @@ module Engine.Geom (
 , Line(Line)
 , parameterized
 , intersectionParameters
+, intersection
 ) where
 
 ---
@@ -42,7 +43,7 @@ reversed :: Angle -> Angle
 reversed (Angle a) = Angle (a - 180.0)
 
 unitCirclePt :: Angle -> Point
-unitCirclePt (Angle a) = Point ((cos a), (sin a))
+unitCirclePt (Angle a) = Point (cos a, sin a)
 
 instance Semigroup Angle where
     (<>) = (+)
@@ -81,7 +82,7 @@ ptMap2 :: (Double -> Double -> Double) -> Point -> Point -> Point
 ptMap2 f (Point (x1, y1)) (Point (x2, y2)) = Point (f x1 x2, f y1 y2)
 
 instance Show Point where
-    show (Point (x,y)) = "Point (" ++ (show x) ++ ", " ++ (show y) ++ ")"
+    show (Point (x,y)) = "Point (" ++ show x ++ ", " ++ show y ++ ")"
 
 instance Num Point where
     (+) = ptMap2 (+)
@@ -112,7 +113,7 @@ data Line = Line {
 } deriving (Show, Eq)
 
 parameterized :: Line -> Double -> Point
-parameterized (Line p a) t = (unitCirclePt a) * (ptFromDouble t) + p
+parameterized (Line p a) t = unitCirclePt a * ptFromDouble t + p
 
 intersectionParameters :: Line -> Line -> (Double, Double)
 intersectionParameters (Line (Point (x1,y1)) (Angle a1)) (Line (Point (x2,y2)) (Angle a2)) = (u,v)
@@ -120,6 +121,11 @@ intersectionParameters (Line (Point (x1,y1)) (Angle a1)) (Line (Point (x2,y2)) (
         dx = x2 - x1
         dy = y2 - y1
         da = a2 - a1
-        csc = 1.0 / (sin da)
+        csc = 1.0 / sin da
         u = csc * (dx * sin a2 - dy * cos a2)
         v = csc * (dx * sin a1 - dy * cos a1)
+
+intersection :: Line -> Line -> Point
+intersection line1 line2 = parameterized line1 u
+    where
+        (u, _) = intersectionParameters line1 line2
