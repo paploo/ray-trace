@@ -1,7 +1,6 @@
 module Engine.Ray (
   Ray(Ray)
-, rayOrigin
-, rayDirection
+, rayLine
 , rayIntensity
 , rayWavelength
 , geometricRay
@@ -27,16 +26,14 @@ greenYellowWave = Wavelength 0.550
 --
 
 data Ray = Ray {
-    rayOrigin :: Point,
-    rayDirection :: Angle,
+    rayLine :: Line,
     rayIntensity :: Double,
     rayWavelength :: Wavelength
 } deriving (Show, Eq)
 
-geometricRay :: Point -> Angle -> Ray
-geometricRay o a = Ray {
-    rayOrigin = o,
-    rayDirection = a,
+geometricRay :: Line -> Ray
+geometricRay l = Ray {
+    rayLine = l,
     rayIntensity = 1.0,
     rayWavelength = greenYellowWave
 }
