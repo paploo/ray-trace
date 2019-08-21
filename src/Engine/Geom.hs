@@ -6,7 +6,6 @@ module Engine.Geom (
 , zeroAng
 , fromDegrees
 , degrees
-, reversed
 , unitCirclePt
 
 , Point(Point)
@@ -19,7 +18,10 @@ module Engine.Geom (
 , unitCircleAng
 
 , Line(Line)
+, rotate
+, reversed
 , parameterized
+, isIntersecting
 , intersectionParameters
 , intersection
 ) where
@@ -39,8 +41,8 @@ fromDegrees a = Angle (a * pi / 180.0)
 degrees :: Angle -> Double
 degrees (Angle a) = a * 180.0 / pi
 
-reversed :: Angle -> Angle
-reversed (Angle a) = Angle (a - 180.0)
+--reversed :: Angle -> Angle
+--reversed (Angle a) = Angle (a - 180.0)
 
 unitCirclePt :: Angle -> Point
 unitCirclePt (Angle a) = Point (cos a, sin a)
@@ -112,8 +114,23 @@ data Line = Line {
     lineAng :: Angle
 } deriving (Show, Eq)
 
+rotate :: Line -> Angle -> Line
+rotate (Line p a0) a1 = Line p (a0 + a1)
+
+reversed :: Line -> Line
+reversed = flip rotate (Angle (-pi))
+
 parameterized :: Line -> Double -> Point
 parameterized (Line p a) t = unitCirclePt a * ptFromDouble t + p
+
+-- Lines are considered intersecting if their slopes are different; thus
+-- perfectly overlapping lines are considered non-intersecting.
+--
+-- The overlapping is not intersecting decision is partly due mostly to being
+-- a convenient side-effect of the math and signatures, but without a well
+-- defined intersection, none of the operations make sense anyway.
+isIntersecting :: Line -> Line -> Bool
+isIntersecting (Line _ (Angle a1)) (Line _ (Angle a2)) = a1 /= a2
 
 intersectionParameters :: Line -> Line -> (Double, Double)
 intersectionParameters (Line (Point (x1,y1)) (Angle a1)) (Line (Point (x2,y2)) (Angle a2)) = (u,v)

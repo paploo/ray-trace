@@ -20,3 +20,10 @@ shouldBeAbout value expected = expectTrue errorMsg (delta <= epsilon)
         epsilon = 1e-12
         delta = abs $ expected - value
         errorMsg = show value <> " is not within tolerances of " <> show expected <> " (delta = " <> show delta <> ")"
+
+-- This is all Prelude does for these on `read "Infinity"` and `read "NaN"` (in convert Frac)
+--infinity :: Double
+--infinity = 1 / 0
+--
+--nan :: Double
+--nan = 0 / 0

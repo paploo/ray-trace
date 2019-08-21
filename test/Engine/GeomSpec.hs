@@ -11,10 +11,11 @@ ptShouldBeAbout (Point (x,y)) (Point (ex,ey)) = do
     x `shouldBeAbout` ex
     y `shouldBeAbout` ey
 
-
+{-# ANN spec "HLint: ignore Redundant do" #-}
+{-# ANN spec "HLint: ignore Redundant $" #-}
 spec :: Spec
 spec = do
-    describe "Angle" $
+    describe "Angle" $ do
 
         describe "creation and access" $ do
 
@@ -28,7 +29,7 @@ spec = do
                 degrees (Angle pi) `shouldBe` 180.0
 
 
-    describe "Point" $
+    describe "Point" $ do
 
         describe "creation and accessors" $ do
 
@@ -42,11 +43,42 @@ spec = do
                 ptFromDouble 3.2 `shouldBe` Point (3.2, 3.2)
 
 
-    describe "Line" $
+    describe "Line" $ do
 
         describe "parameterization and intersection" $ do
 
-            it "should solve for the intersection of two rays" $ let
+            -- parameterize line
+
+            it "should be parameterized" $ let
+                line = Line (Point (3,4)) (Angle (pi/6))
+                result = parameterized line 2.0
+                expected = Point (3 + sqrt 3, 4+1)
+                in
+                  result `ptShouldBeAbout` expected
+
+            -- is intersecting
+
+            it "should show two intersecting lines as intersecting" $ let
+                line1 = Line (Point (-1, 10)) (Angle (pi/3))
+                line2 = Line (Point (1, 10)) (Angle (pi - pi/3))
+                in
+                    (line1 `isIntersecting` line2) `shouldBe` True
+
+            it "should show two non-intersecting lines as non-intersecting" $ let
+                line1 = Line (Point (-1, 10)) (Angle (pi/4))
+                line2 = Line (Point (1, 3)) (Angle (pi/4))
+                in
+                    (line1 `isIntersecting` line2) `shouldBe` False
+
+            it "should show two overlapping lines as non-intersecting" $ let
+                line1 = Line (Point (-1, -1)) (Angle (pi/4))
+                line2 = Line (Point (1, 1)) (Angle (pi/4))
+                in
+                    (line1 `isIntersecting` line2) `shouldBe` False
+
+            -- intersection parameters
+
+            it "should solve the parameters for the intersection of two lines" $ let
                 line1 = Line (Point (-1, 10)) (Angle (pi/3))
                 line2 = Line (Point (1, 10)) (Angle (pi - pi/3))
                 (u, v) = intersectionParameters line1 line2
@@ -57,14 +89,23 @@ spec = do
                     v `shouldBeAbout` 2.0
                     point1 `ptShouldBeAbout` point2
 
+            it "should give infinite values for the intersection parameters when the lines overlap at every point" $ let
+                line1 = Line (Point (0, 0)) (Angle (pi/4))
+                line2 = Line (Point (1, 1)) (Angle (pi/4))
+                (u, v) = intersectionParameters line1 line2
+                in do
+                   u `shouldSatisfy` isInfinite
+                   v `shouldSatisfy` isInfinite
 
-            it "should be parameterized" $ let
-                line = Line (Point (3,4)) (Angle (pi/6))
-                result = parameterized line 2.0
-                expected = Point (3 + sqrt 3, 4+1)
-                in
-                  result `ptShouldBeAbout` expected
+            it "should give infinite values for the intersection parameters when the lines never intersect" $ let
+                line1 = Line (Point (-1, 10)) (Angle (pi/4))
+                line2 = Line (Point (1, 1)) (Angle (pi/4))
+                (u, v) = intersectionParameters line1 line2
+                in do
+                   u `shouldSatisfy` isInfinite
+                   v `shouldSatisfy` isInfinite
 
+            -- intersection point
 
             it "should calculate the intersection of two lines" $ let
                 line1 = Line (Point (-1, 10)) (Angle (pi/3))
@@ -73,19 +114,25 @@ spec = do
                 in
                     p `ptShouldBeAbout` Point (0, 10 + sqrt 3)
 
-            it "should calculate the intersection of lines perpendicular to the axes" $ let
+            it "should calculate the intersection of lines perpendicular to the coordinate axes" $ let
                 line1 = Line (Point (1,2)) (Angle 0) -- y = 2 forall x
                 line2 = Line (Point (3,4)) (Angle (pi/2)) -- x = 3 forall y
                 p = intersection line1 line2
                 in
                     p `ptShouldBeAbout` Point (3,2)
-                
-            it "should return the starting point of the first line if they are the same line (but offset in prameter)" $ let
+
+            it "should treat like non-intersecting if perfectly overlapped" $ let
                 line1 = Line (Point(1,1)) (Angle pi/4)
                 line2 = Line (Point(2,2)) (Angle pi/4)
                 p = intersection line1 line2
-                in
-                    p `ptShouldBeAbout` Point (1,1)
-                    
-            it "should do what ??? if they never intersect? I guess we neeed a predicate method for that?" $
-                pending --Maybe we need to return a Maybe Point?
+                in do
+                    ptX p `shouldSatisfy` isInfinite
+                    ptY p `shouldSatisfy` isInfinite
+
+            it "should give +/- Infinity in at least one coordinate if the lines do not intersect at all" $ let
+                line1 = Line (Point (0, 0)) (Angle (pi/4))
+                line2 = Line (Point (-10, 3)) (Angle (pi/4))
+                p = intersection line1 line2
+                in do
+                    ptX p `shouldSatisfy` isInfinite
+                    ptY p `shouldSatisfy` isInfinite
