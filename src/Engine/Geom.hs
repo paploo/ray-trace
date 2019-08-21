@@ -82,7 +82,7 @@ ptMap2 :: (Double -> Double -> Double) -> Point -> Point -> Point
 ptMap2 f (Point (x1, y1)) (Point (x2, y2)) = Point (f x1 x2, f y1 y2)
 
 instance Show Point where
-    show (Point (x,y)) = "Point (" ++ show x ++ ", " ++ show y ++ ")"
+    show (Point (x,y)) = "Point (" <> (show x <> ", " <> show y <> ")")
 
 instance Num Point where
     (+) = ptMap2 (+)

@@ -19,4 +19,4 @@ shouldBeAbout value expected = expectTrue errorMsg (delta <= epsilon)
     where
         epsilon = 1e-12
         delta = abs $ expected - value
-        errorMsg = show value ++ " is not within tolerances of " ++ show expected ++ " (delta = " ++ show delta ++ ")"
+        errorMsg = show value <> " is not within tolerances of " <> show expected <> " (delta = " <> show delta <> ")"
